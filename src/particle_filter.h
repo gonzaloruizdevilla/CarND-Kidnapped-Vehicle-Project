@@ -63,9 +63,36 @@ class ParticleFilter {
    * @param predicted Vector of predicted landmark observations
    * @param observations Vector of landmark observations
    */
-  void dataAssociation(std::vector<LandmarkObs> predicted, 
-                       std::vector<LandmarkObs>& observations);
-  
+  void dataAssociation(Particle &particle,
+                       std::vector<LandmarkObs> predicted,
+                       std::vector<LandmarkObs> &observations,
+                       double sensor_range);
+
+  /**
+   * updateParticleWeight Update the particle weight.
+   * @param predicted Vector of predicted landmark observations
+   * @param std_landmark[] Array of dimension 2
+   *   [Landmark measurement uncertainty [x [m], y [m]]]
+   * @param observations Vector of landmark observations
+   * @param map Map class containing map landmarks
+   */
+  void updateParticleWeight(Particle &particle,
+                            double std_landmark[],
+                            const std::vector<LandmarkObs> &observations,
+                            const std::vector<LandmarkObs> &landmarks);
+  /**
+   * transformObservations Returns observations transformed from particle to map coordinates.
+   * @param particle Particle used as origin for coordinates
+   * @param observations Observations to transform
+   */
+  std::vector<LandmarkObs> transformObservations(Particle &particle,
+                                                 const std::vector<LandmarkObs> &observations);
+
+  /**
+   * inrangeLandmarks Returns landmarks in range of a particle sensor.
+   * @param particle Particle to search landmarks around of
+   */
+  std::vector<LandmarkObs> inrangeLandmarks(const Particle &particle, double sensor_range, const Map &map_landmarks);
   /**
    * updateWeights Updates the weights for each particle based on the likelihood
    *   of the observed measurements. 
@@ -75,10 +102,10 @@ class ParticleFilter {
    * @param observations Vector of landmark observations
    * @param map Map class containing map landmarks
    */
-  void updateWeights(double sensor_range, double std_landmark[], 
+  void updateWeights(double sensor_range, double std_landmark[],
                      const std::vector<LandmarkObs> &observations,
                      const Map &map_landmarks);
-  
+
   /**
    * resample Resamples from the updated set of particles to form
    *   the new set of particles.
